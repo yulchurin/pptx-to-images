@@ -28,7 +28,7 @@ var_dump($images);
 */
 
 foreach ($files as $image) {
-    echo "<img src=\"$folder/$image\" class=\"img-fluid\">";
+    echo "<p><img src=\"$folder/$image\" class=\"img-fluid\"></p>";
 }
 
 require_once 'footer.php';
