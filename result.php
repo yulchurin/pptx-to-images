@@ -7,6 +7,7 @@ if (isset($_GET['f'])) {
     exit('no action');
 }
 
+// костыль...
 $files = scandir($folder);
 unset($files[0]);
 unset($files[1]);
@@ -25,7 +26,6 @@ $images = glob("$folder/*.{jpeg,jpg,png}", GLOB_BRACE);
 var_dump($gallery);
 var_dump($images);
 */
-
 
 foreach ($files as $image) {
     echo "<img src=\"$folder/$image\" class=\"img-fluid\">";

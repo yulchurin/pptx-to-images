@@ -8,7 +8,6 @@
             <div class="form-group">
                 <label for="exampleFormControlSelect1">Output select</label>
                 <select class="form-control" id="output" name="output">
-                    <option value="png">PNG</option>
                     <option value="jpg">JPG</option>
                     <option value="pdf">PDF</option>
                 </select>

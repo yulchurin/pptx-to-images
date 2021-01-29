@@ -3,15 +3,12 @@
 /*
  * Для корректной работы на сервере должны быть установлены:
  * LibreOffice
- * Расширение PHP ImageMagick
+ * poppler-utils
  * GhostScript
  * Должны быть установлены соответствующие права в sudoers
- * sudo libreoffice --headless --convert-to pdf --outdir aaa proper.pptx
 */
 
 namespace Presentation;
-
-use Imagick;
 
 class Pptx
 {
@@ -26,9 +23,10 @@ class Pptx
     {
         $this->size = $pptx['size'];
         $this->type = $pptx['type'];
-        $this->name = htmlspecialchars($pptx['name']);
+        $string = str_replace(' ', '_', $pptx['name']);
+        $this->name = htmlspecialchars($string);
         $this->tmp_name = $pptx['tmp_name'];
-        $this->dir = substr($pptx['name'], 0 , (strrpos($pptx['name'], '.')));
+        $this->dir = substr($string, 0 , (strrpos($string, '.')));
     }
 
     public function upload()
@@ -43,7 +41,7 @@ class Pptx
             $cmd = "sudo libreoffice --headless --convert-to pdf --outdir $this->dir $this->dir/$this->name";
             $this->pdffile = $this->dir.'/'.$this->dir.'.pdf';
             if (shell_exec($cmd)) {
-                return 'pptx was uploaded and was converted into pdf';
+                return 'presentation was uploaded and was converted into pdf';
             } else {
                 return 'something wrong';
             }
@@ -52,35 +50,11 @@ class Pptx
         }
     }
 
-    public function convertToPNG()
-    {
-        $this->imagickConverse('PNG');
-    }
-
     public function convertToJPG()
     {
-        $this->imagickConverse('JPG');
+        $this->pdftoppmConverse();
     }
 
-    private function imagickConverse($ext)
-    {
-        $im = new imagick($this->pdffile);
-        $pages = $im->getNumberImages();
-
-        if ($pages < 3) {
-            $resolution = 300;
-        } else {
-            $resolution = floor(sqrt(500000/$pages));
-        }
-        $imagick = new imagick();
-        $imagick->setResolution($resolution, $resolution);
-        $imagick->readImage($this->pdffile);
-        $imagick->setImageFormat($ext);
-        foreach($imagick as $i => $imagick) {
-            $imagick->writeImage($this->dir . "/page-". ($i+1) .'.'.$ext);
-        }
-        $imagick->clear();
-    }
 
     /**
      * @return false|string
@@ -88,6 +62,24 @@ class Pptx
     public function getDir()
     {
         return $this->dir;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPdffile()
+    {
+        return $this->pdffile;
+    }
+
+    private function pdftoppmConverse()
+    {
+        $cmd = "sudo pdftoppm -jpeg -r 96 $this->pdffile $this->dir/slide";
+        if (shell_exec($cmd)) {
+            return('success');
+        } else {
+            return('pdf to image conversion error');
+        }
     }
 
 }
