@@ -35,7 +35,14 @@ class Pptx
 
         if ($this->size > $max_size) {
             return("размер файла не должен превышать $max_size Байт");
-        } elseif ($this->type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+        } elseif ($this->type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                  /* && TODO: включить проверку первых байтов по шаблону: 50 4B 03 04 14 00 06 00
+                  *    либо сделать unzip и посмотреть по структуре, чтобы понять, что там нормальный PPTX,
+                  *    а не фашист троян. Решение будет чуть позже
+                  *    проверка просто по $_FILE['type'] не даёт никаких гарантий
+                  */
+                  
+                 ) {
             mkdir($this->dir);
             move_uploaded_file($this->tmp_name, $this->dir.'/'.$this->name);
             $cmd = "sudo libreoffice --headless --convert-to pdf --outdir $this->dir $this->dir/$this->name";
