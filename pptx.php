@@ -6,6 +6,7 @@
  * poppler-utils
  * GhostScript
  * Должны быть установлены соответствующие права в sudoers
+ !!!Потенциально опасный скрипт, для работы необходима аутентификация и авторизация!!!
 */
 
 namespace Presentation;
@@ -36,12 +37,12 @@ class Pptx
         if ($this->size > $max_size) {
             return("размер файла не должен превышать $max_size Байт");
         } elseif ($this->type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-                  /* && TODO: включить проверку первых байтов по шаблону: 50 4B 03 04 14 00 06 00
+                  /* && TODO: 
+                  *    включить проверку первых байтов по шаблону: 50 4B 03 04 14 00 06 00
                   *    либо сделать unzip и посмотреть по структуре, чтобы понять, что там нормальный PPTX,
-                  *    а не фашист троян. Решение будет чуть позже
-                  *    проверка просто по $_FILE['type'] не даёт никаких гарантий
+                  *    а не фашист троян.
+                  *    проверка просто по $_FILE['type'] не даёт никаких гарантий!!!
                   */
-                  
                  ) {
             mkdir($this->dir);
             move_uploaded_file($this->tmp_name, $this->dir.'/'.$this->name);
@@ -52,6 +53,7 @@ class Pptx
             } else {
                 return 'something wrong';
             }
+            unlink($this->dir.'/'.$this->name); // удаляем загруженный пользователем файл
         } else {
             return 'nope';
         }
@@ -59,10 +61,15 @@ class Pptx
 
     public function convertToJPG()
     {
-        $this->pdftoppmConverse();
+        $this->pdfToPpmConverse();
     }
-
-
+    
+    private function deleteAllJPGnPNG()
+    {
+        array_map('unlink', glob("$this->dir/*.jpg"));
+        array_map('unlink', glob("$this->dir/*.png"));
+    }
+    
     /**
      * @return false|string
      */
@@ -79,7 +86,7 @@ class Pptx
         return $this->pdffile;
     }
 
-    private function pdftoppmConverse()
+    private function pdfToPpmConverse()
     {
         $cmd = "sudo pdftoppm -jpeg -r 96 $this->pdffile $this->dir/slide";
         if (shell_exec($cmd)) {
