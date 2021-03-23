@@ -49,7 +49,7 @@ class Pptx
             $cmd = "sudo libreoffice --headless --convert-to pdf --outdir $this->dir $this->dir/$this->name";
             $this->pdffile = $this->dir.'/'.$this->dir.'.pdf';
             if (shell_exec($cmd)) {
-                return 'presentation was uploaded and was converted into pdf';
+                return 'presentation was uploaded and was converted';
             } else {
                 return 'something wrong';
             }
@@ -57,11 +57,6 @@ class Pptx
         } else {
             return 'nope';
         }
-    }
-
-    public function convertToJPG()
-    {
-        $this->pdfToPpmConverse();
     }
     
     private function deleteAllJPGnPNG()
@@ -86,7 +81,7 @@ class Pptx
         return $this->pdffile;
     }
 
-    private function pdfToPpmConverse()
+    private function pdfToJpeg()
     {
         $cmd = "sudo pdftoppm -jpeg -r 96 $this->pdffile $this->dir/slide";
         if (shell_exec($cmd)) {
