@@ -11,7 +11,7 @@ if (isset($_POST['submit'])) {
         echo $pptx->upload();
         if (isset($_POST['output']) && $_POST['output']==='jpg') {
             echo '<p>JPG</p>';
-            $pptx->convertToJPG();
+            $pptx->pdfToJpeg();
         } elseif (isset($_POST['output']) && $_POST['output']==='pdf') {
             echo '<p><a href="', $pptx->getPdffile(), '">open pdf</a></p>';
         } else {
